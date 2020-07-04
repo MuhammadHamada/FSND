@@ -8,6 +8,7 @@ import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
@@ -44,6 +45,9 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String)
     shows = db.relationship('Show', backref='venue', lazy=True, cascade="all, delete")
 
+    def __repr__(self):
+        return f'<Venue {self.id} {self.name}>'
+
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -60,15 +64,20 @@ class Artist(db.Model):
     seeking_description = db.Column(db.String)
     shows = db.relationship('Show', backref='artist', lazy=True, cascade="all, delete")
 
+    def __repr__(self):
+        return f'<Artist {self.id} {self.name} >'
 
 class Show(db.Model):
 
     __tablename__ = 'Show'
 
     id = db.Column(db.Integer, primary_key=True)
-    start_time = db.Column(db.String(20))
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+    start_time = db.Column(db.DateTime(), nullable=False)
+
+    def __repr__(self):
+        return f'<Show {self.id} {self.artist_id} {self.venue_id}>'
 
 
 #----------------------------------------------------------------------------#
@@ -142,6 +151,25 @@ def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
   venue = Venue.query.get(venue_id)
+
+  past_shows = db.session.query(
+        Show.artist_id,
+        Show.start_time).filter(
+        Show.venue_id == venue.id,
+        Show.start_time < datetime.now()
+    ).all()
+
+  upcoming_shows = db.session.query(
+      Show.artist_id,
+      Show.start_time).filter(
+      Show.venue_id == venue.id,
+      Show.start_time >= datetime.now()
+  ).all()
+
+  print(len(past_shows))
+  print(len(upcoming_shows))
+
+  
   data={
     "id": venue.id,
     "name": venue.name,
