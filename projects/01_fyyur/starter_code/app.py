@@ -74,10 +74,10 @@ class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
-    start_time = db.Column(db.DateTime(), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
-        return f'<Show {self.id} {self.artist_id} {self.venue_id}>'
+        return f'<Show {self.id} {self.artist_id} {self.venue_id} {self.start_time}>'
 
 
 #----------------------------------------------------------------------------#
@@ -108,8 +108,6 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
   venues = Venue.query.order_by('city','state').all()
   data = []
   preCity = ""
@@ -121,7 +119,8 @@ def venues():
     if (curCity != preCity or curState != preState):
       data.append({"city": curCity, "state": curState, "venues":[]})
       indx += 1
-    data[indx]["venues"].append({"id": venue.id, "name": venue.name, "num_upcoming_shows": 0})
+    num_upcoming_shows = db.session.query(Show).filter(Show.venue_id == venue.id, str(Show.start_time) > str(datetime.now())).count()
+    data[indx]["venues"].append({"id": venue.id, "name": venue.name, "num_upcoming_shows": num_upcoming_shows})
     preCity = curCity
     preState = curState
 
@@ -148,27 +147,26 @@ def search_venues():
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
+
   venue = Venue.query.get(venue_id)
 
-  past_shows = db.session.query(
-        Show.artist_id,
-        Show.start_time).filter(
-        Show.venue_id == venue.id,
-        Show.start_time < datetime.now()
-    ).all()
+  list_shows = db.session.query(Show).filter(Show.venue_id == venue_id)
+  past_shows = []
+  upcoming_shows = []
+  for show in list_shows:
+    artist = db.session.query(Artist.name, Artist.image_link).filter(Artist.id == show.artist_id).one()
+    
+    show_add = {
+        "artist_id": show.artist_id,
+        "artist_name": artist.name,
+        "artist_image_link": artist.image_link,
+        "start_time": str(show.start_time)
+    }
 
-  upcoming_shows = db.session.query(
-      Show.artist_id,
-      Show.start_time).filter(
-      Show.venue_id == venue.id,
-      Show.start_time >= datetime.now()
-  ).all()
-
-  print(len(past_shows))
-  print(len(upcoming_shows))
-
+    if (str(show.start_time) < str(datetime.now())):
+        past_shows.append(show_add)
+    else:
+        upcoming_shows.append(show_add)
   
   data={
     "id": venue.id,
@@ -183,15 +181,10 @@ def show_venue(venue_id):
     "seeking_talent": venue.seeking_talent,
     "seeking_description": venue.seeking_description,
     "image_link": venue.image_link,
-    "past_shows": [{
-      "artist_id": 4,
-      "artist_name": "Guns N Petals",
-      "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-      "start_time": "2019-05-21T21:30:00.000Z"
-    }],
-    "upcoming_shows": [],
-    "past_shows_count": 1,
-    "upcoming_shows_count": 0,
+    "past_shows": past_shows,
+    "upcoming_shows": upcoming_shows,
+    "past_shows_count": len(past_shows),
+    "upcoming_shows_count": len(upcoming_shows),
   }
   return render_template('pages/show_venue.html', venue=data)
 
@@ -280,9 +273,27 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
+
   artist = Artist.query.get(artist_id)
+
+  list_shows = db.session.query(Show).filter(Show.artist_id == artist_id)
+  past_shows = []
+  upcoming_shows = []
+  for show in list_shows:
+    venue = db.session.query(Venue.name, Venue.image_link).filter(Venue.id == show.venue_id).one()
+    
+    show_add = {
+        "venue_id": show.venue_id,
+        "venue_name": venue.name,
+        "venue_image_link": venue.image_link,
+        "start_time": str(show.start_time)
+    }
+
+    if (str(show.start_time) < str(datetime.now())):
+        past_shows.append(show_add)
+    else:
+        upcoming_shows.append(show_add)
+
   data={
     "id": artist.id,
     "name": artist.name,
@@ -295,15 +306,10 @@ def show_artist(artist_id):
     "seeking_venue": artist.seeking_venue,
     "seeking_description": artist.seeking_description,
     "image_link": artist.image_link,
-    "past_shows": [{
-      "venue_id": 1,
-      "venue_name": "The Musical Hop",
-      "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-      "start_time": "2019-05-21T21:30:00.000Z"
-    }],
-    "upcoming_shows": [],
-    "past_shows_count": 1,
-    "upcoming_shows_count": 0,
+    "past_shows": past_shows,
+    "upcoming_shows": upcoming_shows,
+    "past_shows_count": len(past_shows),
+    "upcoming_shows_count": len(upcoming_shows),
   }
   return render_template('pages/show_artist.html', artist=data)
 
@@ -330,8 +336,6 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
   artist = Artist.query.filter_by(id=artist_id).first_or_404()
   print(artist)
   form = ArtistForm(request.form)
@@ -344,6 +348,8 @@ def edit_artist_submission(artist_id):
       artist.facebook_link = form.facebook_link.data
       artist.image_link = form.image_link.data
       artist.website_link = form.website_link.data
+      artist.seeking_venue = form.seeking_venue.data
+      artist.seeking_description = form.seeking_description.data
       db.session.commit()
       flash('Artist ' + artist.name + ' was successfully edited!')
   except ValueError:
@@ -376,8 +382,6 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
   venue = Venue.query.filter_by(id=venue_id).first_or_404()
   form = VenueForm(request.form)
   try:
@@ -390,6 +394,8 @@ def edit_venue_submission(venue_id):
       venue.facebook_link = form.facebook_link.data
       venue.image_link = form.image_link.data
       venue.website_link = form.website_link.data
+      venue.seeking_talent = form.seeking_talent.data
+      venue.seeking_description = form.seeking_description.data
       db.session.commit()
       flash('Venue ' + venue.name + ' was successfully edited!')
   except ValueError:
