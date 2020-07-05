@@ -304,3 +304,4 @@ FROM "Show"
 WHERE "Show".venue_id = %(venue_id_1)s AND "Show".start_time < %(start_time_1)s) AS anon_1]
 [parameters: {'venue_id_1': 1, 'start_time_1': datetime.datetime(2020, 7, 4, 13, 38, 44, 268728)}]
 (Background on this error at: http://sqlalche.me/e/f405)
+2020-07-05 03:36:53,093 INFO: errors [in C:\Users\Mohamed Hamada\Documents\demos\FSND\projects\01_fyyur\starter_code\app.py:556]
