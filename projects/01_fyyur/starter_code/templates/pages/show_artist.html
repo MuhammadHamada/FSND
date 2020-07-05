@@ -9,6 +9,7 @@
 		<p class="subtitle">
 			ID: {{ artist.id }}
 		</p>
+		<input id="artist_id" type="hidden" value="{{artist.id}}"/>
 		<div class="genres">
 			{% for genre in artist.genres %}
 			<span class="genre">{{ genre }}</span>
@@ -42,6 +43,11 @@
 	<div class="col-sm-6">
 		<img src="{{ artist.image_link }}" alt="Venue Image" />
 	</div>
+	<div class="col-sm-6">
+		<button class="delete-button" style="margin-right: 16px; color: red;">
+			Delete This Artist
+		</button>
+	</div>
 </div>
 <section>
 	<h2 class="monospace">{{ artist.upcoming_shows_count }} Upcoming {% if artist.upcoming_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
@@ -71,6 +77,34 @@
 		{% endfor %}
 	</div>
 </section>
+
+<script type="text/javascript">
+
+	const btn2 = document.querySelector('.delete-button');
+	
+	btn2.onclick = function(e) {
+
+		const artist_id = Number(document.getElementById("artist_id").value);
+	   fetch('/artists/' + artist_id, {
+	
+		    method: 'DELETE',
+			body: JSON.stringify({
+				'id': artist_id,
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			}
+	
+	   }).then(function(jsonResponse) {
+			console.log('response', jsonResponse);
+			window.location.href = "/";
+		})
+		.catch(function() {
+		})
+	}
+
+	
+</script>
 
 {% endblock %}
 

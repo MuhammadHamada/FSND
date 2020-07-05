@@ -5,7 +5,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -108,7 +108,7 @@ def index():
 
 @app.route('/venues')
 def venues():
-  venues = Venue.query.order_by('city','state').all()
+  venues = Venue.query.order_by('city','state','id').all()
   data = []
   preCity = ""
   preState = ""
@@ -231,12 +231,27 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  error = False
+  body = {}
+  name = ""
+  try:
+    venue = Venue.query.get(venue_id)
+    name = venue.name
+    db.session.delete(venue)
+    db.session.commit()
+    body['name']= venue.name
+    body['id'] = venue.id
+    flash('Venue ' + name + ' was successfully deleted!')
+  except ValueError as e:
+    print(e)
+    db.session.rollback()
+    flash('Error : Venue ' + name + ' could not be deleted!')
+  finally:
+    db.session.close()
+  if error:
+    abort (400)
+  else:
+    return jsonify(body)
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -251,6 +266,30 @@ def artists():
     data.append(x)
 
   return render_template('pages/artists.html', artists=data)
+
+@app.route('/artists/<artist_id>', methods=['DELETE'])
+def delete_artist(artist_id):
+  error = False
+  body = {}
+  name = ""
+  try:
+    artist = Artist.query.get(artist_id)
+    name = artist.name
+    db.session.delete(artist)
+    db.session.commit()
+    body['name']= artist.name
+    body['id'] = artist.id
+    flash('Artist ' + name + ' was successfully deleted!')
+  except ValueError as e:
+    print(e)
+    db.session.rollback()
+    flash('Error : Artist ' + name + ' could not be deleted!')
+  finally:
+    db.session.close()
+  if error:
+    abort (400)
+  else:
+    return jsonify(body)
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
