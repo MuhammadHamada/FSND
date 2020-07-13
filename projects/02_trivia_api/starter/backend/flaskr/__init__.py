@@ -52,9 +52,8 @@ def create_app(test_config=None):
   '''
   @app.route('/categories')
   def retrieve_categories():
-    
-    selection = Category.query.order_by(Category.id).all()
-    categories = [category.format() for category in selection]
+
+    categories = get_category_list()
 
     if len(categories) == 0:
         abort(404)
@@ -89,8 +88,8 @@ def create_app(test_config=None):
     return jsonify({
         'success': True,
         'questions': current_questions,
-        'total_questions': len(selection),
         'categories': get_category_list(),
+        'total_questions': len(Question.query.all()),
         'current_category': None
     })
 
@@ -120,8 +119,8 @@ def create_app(test_config=None):
           'success': True,
           'deleted' : question_id,
           'questions': current_questions,
-          'total_questions': len(Question.query.all()),
           'categories': get_category_list(),
+          'total_questions': len(Question.query.all()),
           'current_category': None
       })
     except:
@@ -137,7 +136,25 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  @app.route('/questions', methods=['POST'])
+  def add_questions():
+    
+    try:
+      question = request.get_json()['question']
+      answer = request.get_json()['answer']
+      difficulty = request.get_json()['difficulty']
+      category = request.get_json()['category']
 
+      newQuestion = Question(question=question, answer=answer, difficulty=difficulty, category=category)
+      newQuestion.insert()
+
+      return jsonify({
+        'success': True
+      })
+
+    except:
+      abort(422)
+  
   '''
   @TODO: 
   Create a POST endpoint to get questions based on a search term. 

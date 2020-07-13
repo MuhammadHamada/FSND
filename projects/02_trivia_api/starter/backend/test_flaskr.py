@@ -42,7 +42,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
     
     def test_get_questions(self):
-        print("helloooooooooo")
         res = self.client().get('/questions/')
         data = json.loads(res.data)
 
