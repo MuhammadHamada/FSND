@@ -305,3 +305,20 @@ WHERE "Show".venue_id = %(venue_id_1)s AND "Show".start_time < %(start_time_1)s)
 [parameters: {'venue_id_1': 1, 'start_time_1': datetime.datetime(2020, 7, 4, 13, 38, 44, 268728)}]
 (Background on this error at: http://sqlalche.me/e/f405)
 2020-07-05 03:36:53,093 INFO: errors [in C:\Users\Mohamed Hamada\Documents\demos\FSND\projects\01_fyyur\starter_code\app.py:556]
+2020-07-05 03:44:55,175 ERROR: Exception on /artists/14 [GET] [in C:\Program Files\Python37\lib\site-packages\flask\app.py:1892]
+Traceback (most recent call last):
+  File "C:\Program Files\Python37\lib\site-packages\flask\app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Program Files\Python37\lib\site-packages\flask\app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Program Files\Python37\lib\site-packages\flask\app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "C:\Program Files\Python37\lib\site-packages\flask\_compat.py", line 39, in reraise
+    raise value
+  File "C:\Program Files\Python37\lib\site-packages\flask\app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Program Files\Python37\lib\site-packages\flask\app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\Users\Mohamed Hamada\Documents\demos\FSND\projects\01_fyyur\starter_code\app.py", line 337, in show_artist
+    "id": artist.id,
+AttributeError: 'NoneType' object has no attribute 'id'
