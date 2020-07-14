@@ -87,8 +87,8 @@ The API will return two error types when request fail:
 
 #### GET /categories
 
-- General: Returns a list of all categories of questions and sucess value.
-- Smaple: curl ` http://127.0.0.1:5000/categories `
+- General: Returns a list of all categories of questions and success value.
+- Sample: `curl  http://127.0.0.1:5000/categories `
 ```
 {
 "categories":
@@ -106,9 +106,9 @@ The API will return two error types when request fail:
 
 #### GET /questions/
 - General: 
-    - Returns a list of all existing categories and list of all questions and sucess value and total number of questions.
+    - Returns a list of all existing categories and list of all questions and success value and total number of questions.
     - Results are paginated in groups of 10. Include a request argument to choose page number, starting from 1.
-- Smaple: curl ` http://127.0.0.1:5000/questions/`
+- Sample: `curl  http://127.0.0.1:5000/questions/`
 ```
 {
   "categories": {
@@ -197,12 +197,234 @@ The API will return two error types when request fail:
 }
 ```
 
-#### DELETE /questions/<int:question_id>
+#### DELETE /questions/{question_id}
+
+- General: 
+    - Deletes the question of the given ID if exists. Returns the id of the deleted question, success value, total number of questions and question list based on current page number to update the frontend. 
+- Sample: `curl  -X DELETE http://127.0.0.1:5000/questions/23`
+```
+{
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "current_category": null,
+  "deleted": 23,
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    {
+      "answer": "Tom Cruise",
+      "category": 5,
+      "difficulty": 4,
+      "id": 4,
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    },
+    {
+      "answer": "Maya Angelou",
+      "category": 4,
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    },
+    {
+      "answer": "Edward Scissorhands",
+      "category": 5,
+      "difficulty": 3,
+      "id": 6,
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    },
+    {
+      "answer": "Muhammad Ali",
+      "category": 4,
+      "difficulty": 1,
+      "id": 9,
+      "question": "What boxer's original name is Cassius Clay?"
+    },
+    {
+      "answer": "Brazil",
+      "category": 6,
+      "difficulty": 3,
+      "id": 10,
+      "question": "Which is the only team to play in every soccer World Cup tournament?"
+    },
+    {
+      "answer": "Uruguay",
+      "category": 6,
+      "difficulty": 4,
+      "id": 11,
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    },
+    {
+      "answer": "George Washington Carver",
+      "category": 4,
+      "difficulty": 2,
+      "id": 12,
+      "question": "Who invented Peanut Butter?"
+    },
+    {
+      "answer": "Lake Victoria",
+      "category": 3,
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "Agra",
+      "category": 3,
+      "difficulty": 2,
+      "id": 15,
+      "question": "The Taj Mahal is located in which Indian city?"
+    }
+  ],
+  "success": true,
+  "total_questions": 17
+}
+```
 
 #### POST /questions
 
+- General: 
+    - Create new question using the submitted question, answer, category and difficulty. Returns the ID of the created question and success value. 
+- Sample: `curl -X POST http://127.0.0.1:5000/questions -H "content-type: application/json" -d "{\"question\":\"How are you ?\" , \"answer\":\"fine thank you\" , \"category\":\"1\" , \"difficulty\":1}"`
+```
+{
+  "created_id": 29,
+  "success": true
+}
+```
+
 #### POST /search
 
-#### GET /categories/<int:category_id>/questions
+- General: 
+    - Returns list of questions based on submitted SearchTerm, total number of questions in the result and success value.
+
+- Sample: `curl -X POST http://127.0.0.1:5000/search -H "content-type: application/json" -d "{\"searchTerm\":\"what\"}"`
+```
+{
+  "current_category": null,
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    {
+      "answer": "Tom Cruise",
+      "category": 5,
+      "difficulty": 4,
+      "id": 4,
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    },
+    {
+      "answer": "Edward Scissorhands",
+      "category": 5,
+      "difficulty": 3,
+      "id": 6,
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    },
+    {
+      "answer": "Muhammad Ali",
+      "category": 4,
+      "difficulty": 1,
+      "id": 9,
+      "question": "What boxer's original name is Cassius Clay?"
+    },
+    {
+      "answer": "Lake Victoria",
+      "category": 3,
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "Mona Lisa",
+      "category": 2,
+      "difficulty": 3,
+      "id": 17,
+      "question": "La Giaconda is better known as what?"
+    },
+    {
+      "answer": "The Liver",
+      "category": 1,
+      "difficulty": 4,
+      "id": 20,
+      "question": "What is the heaviest organ in the human body?"
+    },
+    {
+      "answer": "Blood",
+      "category": 1,
+      "difficulty": 4,
+      "id": 22,
+      "question": "Hematology is a branch of medicine involving the study of what?"
+    }
+  ],
+  "success": true,
+  "total_questions": 8
+}
+```
+
+#### GET /categories/{category_id}/questions
+- General: 
+    - Returns list of questions of a specific category, current_category with the given ID, total number of listed questions and success value.
+- Sample: `curl http://127.0.0.1:5000/categories/1/questions`
+```
+{
+  "current_category": 1,
+  "questions": [
+    {
+      "answer": "The Liver",
+      "category": 1,
+      "difficulty": 4,
+      "id": 20,
+      "question": "What is the heaviest organ in the human body?"
+    },
+    {
+      "answer": "Alexander Fleming",
+      "category": 1,
+      "difficulty": 3,
+      "id": 21,
+      "question": "Who discovered penicillin?"
+    },
+    {
+      "answer": "Blood",
+      "category": 1,
+      "difficulty": 4,
+      "id": 22,
+      "question": "Hematology is a branch of medicine involving the study of what?"
+    }
+  ],
+  "success": true,
+  "total_questions": 3
+}
+```
 
 #### POST /quizzes
+- General: 
+    - Returns the next question in the quiz and success value based on the submitted the list of previous_questions and the quiz category.
+- Sample: `curl -X POST http://127.0.0.1:5000/quizzes -H "content-type: application/json" -d "{\"previous_questions\": [20], \"quiz_category\": {\"type\": \"Science\", \"id\": \"1\"}}"`
+```
+{
+  "question": {
+    "answer": "Alexander Fleming",
+    "category": 1,
+    "difficulty": 3,
+    "id": 21,
+    "question": "Who discovered penicillin?"
+  },
+  "success": true
+}
+```
+
+## Deployment N/A
