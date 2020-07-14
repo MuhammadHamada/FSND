@@ -89,7 +89,7 @@ The API will return two error types when request fail:
 
 - General:
     - Returns a list of all categories of questions
-- Smaple: curl http://127.0.0.1:5000/categories
+- Smaple: curl ``` http://127.0.0.1:5000/categories ```
 ```
 {
 "categories":
