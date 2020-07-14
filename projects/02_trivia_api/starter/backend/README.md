@@ -83,4 +83,36 @@ The API will return two error types when request fail:
 - 404 Resource Not Found
 - 422 Not Processable
 ```
+### Endpoints
 
+#### GET /categories
+
+- General:
+    - Returns a list of all categories of questions
+- Smaple: curl http://127.0.0.1:5000/categories
+```
+{
+"categories":
+    {
+    "1":"Science",
+    "2":"Art",
+    "3":"Geography",
+    "4":"History",
+    "5":"Entertainment",
+    "6":"Sports"
+    },
+"success":true
+}
+```
+
+#### GET /questions
+
+#### DELETE /questions/<int:question_id>
+
+#### POST /questions
+
+#### POST /search
+
+#### GET /categories/<int:category_id>/questions
+
+#### POST /quizzes
