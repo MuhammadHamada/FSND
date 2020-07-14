@@ -223,7 +223,6 @@ def create_app(test_config=None):
   def get_question_for_quiz():
     if request.data:
       data = request.get_json()
-      print(data)
       if (('quiz_category' in data and 'id' in data['quiz_category']) and 'previous_questions' in data):
         category_id = data['quiz_category']['id']
         questions_query = None
