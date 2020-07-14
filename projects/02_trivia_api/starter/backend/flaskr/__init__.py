@@ -195,7 +195,7 @@ def create_app(test_config=None):
   def get_category_questions(category_id):
 
     try:
-      category_questions = Question.query.order_by(Question.id).filter(Question.category == category_id).all()
+      category_questions = Question.query.order_by(Question.id).filter(Question.category == str(category_id)).all()
       current_questions = paginate_questions(request,category_questions)
 
       return jsonify({

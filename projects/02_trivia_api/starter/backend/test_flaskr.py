@@ -116,6 +116,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['questions'])
         self.assertTrue(data['total_questions'])
         self.assertEqual(data['current_category'], 1)
+    
+    def test_get_questions_by_not_exist_category(self):
+        res = self.client().get('/categories/1000/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertFalse(data['questions'])
+        self.assertFalse(data['total_questions'])
+        self.assertEqual(data['current_category'], 1000)
 
 
 # Make the tests conveniently executable
