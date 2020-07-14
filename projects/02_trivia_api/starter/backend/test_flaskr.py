@@ -57,6 +57,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['questions'])
         self.assertTrue(data['total_questions'])
         self.assertTrue(data['categories'])
+    
+    def test_404_errorhandler_if_page_does_not_exist(self):
+        res = self.client().get('/questions/?page=10000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['error'], 404)
+        self.assertEqual(data['message'],"resource not found")
 
     def test_delete_questions(self):
 
@@ -79,6 +88,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['total_questions'])
         self.assertEqual(data['deleted'], id)
         self.assertEqual(question, None)
+    
+    def test_delete_not_exist_question(self):
+        res = self.client().delete('/questions/10000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['error'], 422)
+        self.assertEqual(data['message'],"unprocessable")
 
     def test_add_question(self):
         res = self.client().post('/questions' , json=self.new_question)
@@ -126,6 +144,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertFalse(data['questions'])
         self.assertFalse(data['total_questions'])
         self.assertEqual(data['current_category'], 1000)
+
 
 
 # Make the tests conveniently executable
