@@ -222,12 +222,21 @@ def create_app(test_config=None):
   def get_question_for_quiz():
     if request.data:
       data = request.get_json()
+      print(data)
       if (('quiz_category' in data and 'id' in data['quiz_category']) and 'previous_questions' in data):
-        questions_query = Question.query.filter_by(
-        category=data['quiz_category']['id']
-        ).filter(
-            Question.id.notin_(data["previous_questions"])
-        ).all()
+        category_id = data['quiz_category']['id']
+        questions_query = None
+        if(str(category_id) != "0"):
+          questions_query = Question.query.filter_by(
+          category=category_id
+          ).filter(
+              Question.id.notin_(data["previous_questions"])
+          ).all()
+        else:
+          questions_query = Question.query.filter(
+              Question.id.notin_(data["previous_questions"])
+          ).all()
+        
         length_of_available_question = len(questions_query)
         if length_of_available_question > 0:
           result = {
