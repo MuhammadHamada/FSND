@@ -149,7 +149,8 @@ def create_app(test_config=None):
       newQuestion.insert()
 
       return jsonify({
-        'success': True
+        'success': True,
+        'created_id' : newQuestion.id
       })
 
     except:
@@ -263,6 +264,21 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+  @app.errorhandler(404)
+  def not_found(error):
+      return jsonify({
+          "success": False, 
+          "error": 404,
+          "message": "resource not found"
+      }), 404
+
+  @app.errorhandler(422)
+  def unprocessable(error):
+      return jsonify({
+          "success": False, 
+          "error": 422,
+          "message": "unprocessable"
+      }), 422
   
   return app
 
