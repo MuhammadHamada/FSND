@@ -35,7 +35,8 @@ def create_app(test_config=None):
     setup_db(app)
 
     '''
-  Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+  Set up CORS. Allow '*' for origins.
+  Delete the sample route after completing the TODOs
   '''
     CORS(app)
 
@@ -75,7 +76,8 @@ def create_app(test_config=None):
 
   TEST: At this point, when you start the application
   you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
+  ten questions per page and pagination at the bottom of
+  the screen for three pages.
   Clicking on the page numbers should update the questions.
   '''
     @app.route('/questions/')
@@ -98,7 +100,8 @@ def create_app(test_config=None):
     '''
   Creating an endpoint to DELETE question using a question ID.
 
-  TEST: When you click the trash icon next to a question, the question will be removed.
+  TEST: When you click the trash icon next to a question,
+  the question will be removed.
   This removal will persist in the database and when you refresh the page.
   '''
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
@@ -227,7 +230,9 @@ def create_app(test_config=None):
         if request.data:
             data = request.get_json()
             if ((
-                    'quiz_category' in data and 'id' in data['quiz_category']) and 'previous_questions' in data):
+                    'quiz_category' in data and
+                    'id' in data['quiz_category']) and
+                    'previous_questions' in data):
                 category_id = data['quiz_category']['id']
                 questions_query = None
                 if(str(category_id) != "0"):
