@@ -18,12 +18,7 @@ class TriviaTestCase(unittest.TestCase):
         self.database_path = "postgres://{}:{}@{}/{}".format('postgres', '1234','localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
-        self.new_question = {
-            'question': 'How are you ?',
-            'answer': 'fine thank you',
-            'category': 'Science',
-            'difficulty': 1
-        }
+        self.new_question = {'question': 'How are you ?','answer': 'fine thank you','category': '1','difficulty': 1}
 
         # binds the app to the current context
         with self.app.app_context():
@@ -68,7 +63,7 @@ class TriviaTestCase(unittest.TestCase):
 
         new_question = Question(question="How are you ?",
         answer="fine thank you",
-        category="Science",
+        category="1",
         difficulty=1)
 
         new_question.insert()
@@ -99,7 +94,7 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().post('/questions' , json=self.new_question)
         data = json.loads(res.data)
 
-        self.client().delete('/questions'+str(data['created_id']))
+        self.client().delete('/questions/' + str(data['created_id']))
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
