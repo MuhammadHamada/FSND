@@ -82,6 +82,7 @@ def get_drinks_detail():
 def create_drinks():
     
     try:
+        print(request.get_json())
         title = request.get_json()['title']
         recipe = request.get_json()['recipe']
 
@@ -117,8 +118,11 @@ def edit_drinks(id):
         if drink is None:
             abort(404)
 
-        drink.title = request.get_json()['title']
-        drink.recipe = json.dumps(request.get_json()['recipe'])
+        
+        if "title" in request.get_json():
+            drink.title = request.get_json()['title']
+        if "recipe" in request.get_json():
+            drink.recipe = json.dumps(request.get_json()['recipe'])
         drink.update()
 
         return jsonify({
@@ -192,12 +196,9 @@ def not_found(error):
     }), 404
 
 '''
-@TODO implement error handler for 404
-    error handler should conform to general task above 
-'''
-
-
-'''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(AuthError)
+def auth_error(e):
+    return jsonify(e.error), e.status_code
