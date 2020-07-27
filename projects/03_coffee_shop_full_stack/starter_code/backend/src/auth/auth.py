@@ -33,6 +33,8 @@ class AuthError(Exception):
 def get_token_auth_header():
     """Obtains the Access Token from the Authorization Header
     """
+    print(request)
+    print(request.headers)
     auth = request.headers.get('Authorization', None)
     if not auth:
         raise AuthError({
@@ -170,7 +172,7 @@ def requires_auth(permission=''):
             token = get_token_auth_header()
             payload = verify_decode_jwt(token)
             check_permissions(permission, payload)
-            return f(payload, *args, **kwargs)
+            return f(*args, **kwargs)
 
         return wrapper
     return requires_auth_decorator

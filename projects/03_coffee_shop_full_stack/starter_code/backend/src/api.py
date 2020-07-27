@@ -16,7 +16,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -27,6 +27,17 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks')
+@requires_auth('get:drinks')
+def get_drinks():
+    
+    drinks = Drink.query.order_by(Drink.id).all()
+
+    return jsonify({
+        "success": True,
+        "drinks": drinks
+    })
+
 
 
 '''
@@ -37,6 +48,16 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks-detail')
+@requires_auth('get:drinks-detail')
+def get_drinks_detail():
+    
+    drinks = Drink.query.order_by(Drink.id).all()
+
+    return jsonify({
+        "success": True,
+        "drinks": drinks
+    })
 
 
 '''
@@ -48,6 +69,24 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def create_drinks():
+    
+    try:
+        title = request.get_json()['title']
+        recipe = request.get_json()['recipe']
+
+        drink = Drink(title=title, recipe=recipe)
+        drink.insert()
+
+        return jsonify({
+            "success": True,
+            "drinks": drink.long()
+        })
+
+    except BaseException:
+            abort(422)
 
 
 '''
@@ -97,6 +136,13 @@ def unprocessable(error):
                     }), 404
 
 '''
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "resource not found"
+    }), 404
 
 '''
 @TODO implement error handler for 404
