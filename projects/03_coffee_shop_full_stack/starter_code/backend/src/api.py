@@ -16,7 +16,7 @@ def after_request(response):
     response.headers.add(
         'Access-Control-Allow-Headers',
         'Content-Type,Authorization,true')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE')
     return response
 
 '''
@@ -82,11 +82,10 @@ def get_drinks_detail():
 def create_drinks():
     
     try:
-        print(request.get_json())
         title = request.get_json()['title']
         recipe = request.get_json()['recipe']
 
-        drink = Drink(title=title, recipe=recipe)
+        drink = Drink(title=title, recipe=json.dumps(recipe))
         drink.insert()
 
         return jsonify({
@@ -115,13 +114,11 @@ def edit_drinks(id):
     
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
-
         if drink is None:
             abort(404)
 
-        
-        title = request.get_json()['title']
-        recipe = request.get_json()['recipe']
+        drink.title = request.get_json()['title']
+        drink.recipe = json.dumps(request.get_json()['recipe'])
         drink.update()
 
         return jsonify({
@@ -150,18 +147,14 @@ def delete_drinks(id):
     
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
-
         if drink is None:
             abort(404)
 
-        
-        title = request.get_json()['title']
-        recipe = request.get_json()['recipe']
         drink.delete()
 
         return jsonify({
             "success": True,
-            "drinks": [drink.long()]
+            "delete": id
         })
 
     except BaseException:
