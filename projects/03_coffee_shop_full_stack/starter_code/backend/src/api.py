@@ -11,12 +11,20 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
+@app.after_request
+def after_request(response):
+    response.headers.add(
+        'Access-Control-Allow-Headers',
+        'Content-Type,Authorization,true')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
+
 '''
 @TODO uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-db_drop_and_create_all()
+#db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -35,7 +43,7 @@ def get_drinks():
 
     return jsonify({
         "success": True,
-        "drinks": drinks
+        "drinks": [drink.short() for drink in drinks]
     })
 
 
@@ -56,7 +64,7 @@ def get_drinks_detail():
 
     return jsonify({
         "success": True,
-        "drinks": drinks
+        "drinks": [drink.long() for drink in drinks]
     })
 
 
@@ -74,6 +82,7 @@ def get_drinks_detail():
 def create_drinks():
     
     try:
+        print(request.get_json())
         title = request.get_json()['title']
         recipe = request.get_json()['recipe']
 
@@ -82,7 +91,7 @@ def create_drinks():
 
         return jsonify({
             "success": True,
-            "drinks": drink.long()
+            "drinks": [drink.long()]
         })
 
     except BaseException:
@@ -100,6 +109,29 @@ def create_drinks():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def edit_drinks(id):
+    
+    try:
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
+
+        if drink is None:
+            abort(404)
+
+        
+        title = request.get_json()['title']
+        recipe = request.get_json()['recipe']
+        drink.update()
+
+        return jsonify({
+            "success": True,
+            "drinks": [drink.long()]
+        })
+
+    except BaseException:
+            abort(422)
+
 
 
 '''
@@ -112,6 +144,28 @@ def create_drinks():
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drinks(id):
+    
+    try:
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
+
+        if drink is None:
+            abort(404)
+
+        
+        title = request.get_json()['title']
+        recipe = request.get_json()['recipe']
+        drink.delete()
+
+        return jsonify({
+            "success": True,
+            "drinks": [drink.long()]
+        })
+
+    except BaseException:
+            abort(422)
 
 
 ## Error Handling
