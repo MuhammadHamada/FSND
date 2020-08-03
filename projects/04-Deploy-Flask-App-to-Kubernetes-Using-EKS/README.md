@@ -26,7 +26,7 @@ The app relies on a secret set as the environment variable `JWT_SECRET` to produ
      
 ## Project Steps
 
-Completing the project involves several steps:
+Completing the project involves several steps as the following:
 
 1. Write a Dockerfile for a simple Flask API
 2. Build and test the container locally
